@@ -1,0 +1,126 @@
+<<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Practica Canvas5, CruzMorenoJesusEnrique</title>
+  </head>
+
+  <body style="background-color: rgb(214, 214, 214)"> 
+    <center><canvas id="canvas01" width="960" height="960"> </canvas></center>
+  </body>
+  
+  <div style="display:none;"> 
+  <script>
+    window.requestAnimationFrame = (function () {
+      return (
+        window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function (callback) {
+          window.setTimeout(callback, 17);
+        }
+      );
+    })();
+    window.requestAnimationFrame(update);
+    //LA CASILLAS VAN A MEDIR 40
+    //POR LO TANTO TENEMOS UN TOTAL DE 24*24 = 576
+
+   //CLASE JUGADOR --------
+   class Jugador {
+      constructor(w, h) {
+        this.x = 0;
+        this.y = 0;
+        this.w = w;
+        this.h = h;
+        // this.speed = 8;
+      }
+
+      pintar(ctx) {
+        ctx.fillStyle = "Cyan";
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+      }
+    }
+
+    class Muro{
+      constructor(x, y, w, h, destruible) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.destruible = destruible
+      }
+
+
+      pintar (ctx){
+        if(!destruible){
+          ctx.fillStyle = "Gray";
+           ctx.fillRect(this.x, this.y, this.w, this.h);
+        }else{ 
+          ctx.fillStyle = "Black";
+           ctx.fillRect(this.x, this.y, this.w, this.h);
+        }
+
+      }
+
+      playerCollider(personaje) {
+        if (
+            this.x < personaje.x + personaje.w  &&  
+                this.x + this.w > personaje.x &&    
+                this.y < personaje.y + personaje.h &&    
+                this.y + this.h> personaje.y
+        ) {
+          console.log("Chin me pegue!");
+          switch (dir) {
+            case 0:
+              personaje.y += 1;
+              break;
+
+            case 1:
+              personaje.y -= 1;
+              break;
+
+            case 2:
+              personaje.x -= 1;
+              break;
+
+            case 3:
+              personaje.x += 1;
+              break;
+
+            default:
+              break;
+          }
+          dir = 4;
+          return true;
+        }
+        return false;
+      }
+    }
+
+
+    var canvas = document.getElementById("canvas01");
+    var ctx = canvas.getContext("2d");
+    var casilla = 24;
+
+    const nivel_prueba = [
+  ['M','M','M','M','M','M','M','M','M','M','M','M','M','M','M'],
+  ['M','x','x',   ,   ,   ,   ,   ,   ,   ,   ,   ,'x','x','M'],
+  ['M','x','M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M','x','M'],
+  ['M','x',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'x','M'],
+  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M'],
+  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
+  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M'],
+  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
+  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M'],
+  ['M','x',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'x','M'],
+  ['M','x','M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M','x','M'],
+  ['M','x','x',   ,   ,   ,   ,   ,   ,   ,   ,   ,'x','x','M'],
+  ['M','M','M','M','M','M','M','M','M','M','M','M','M','M','M']
+];
+
+
+
+
+  </script>
+</html>
