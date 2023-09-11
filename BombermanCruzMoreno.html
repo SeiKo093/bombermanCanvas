@@ -7,7 +7,7 @@
   </head>
 
   <body style="background-color: rgb(214, 214, 214)"> 
-    <center><canvas id="canvas01" width="960" height="960"> </canvas></center>
+    <center><canvas id="canvas01" width="1000" height="1000"> </canvas></center>
   </body>
   
   <div style="display:none;"> 
@@ -23,8 +23,9 @@
       );
     })();
     window.requestAnimationFrame(update);
-    //LA CASILLAS VAN A MEDIR 40
+    //LA CASILLAS VAN A MEDIR 40 por que el espacio a usar 960
     //POR LO TANTO TENEMOS UN TOTAL DE 24*24 = 576
+    //MEDIDA DE BLOQUE NUEVA ES 32 POR LO TANTO TENEMOS UN TOTAL DE 24*32 = 768
 
    //CLASE JUGADOR --------
    class Jugador {
@@ -48,16 +49,17 @@
         this.y = y;
         this.w = w;
         this.h = h;
-        this.destruible = destruible
+        this.destruible = destruible;
+        this.destruido = false;
       }
 
 
       pintar (ctx){
-        if(!destruible){
+        if(!this.destruible){
           ctx.fillStyle = "Gray";
            ctx.fillRect(this.x, this.y, this.w, this.h);
         }else{ 
-          ctx.fillStyle = "Black";
+          ctx.fillStyle = "#C70039";
            ctx.fillRect(this.x, this.y, this.w, this.h);
         }
 
@@ -102,25 +104,74 @@
     var canvas = document.getElementById("canvas01");
     var ctx = canvas.getContext("2d");
     var casilla = 24;
+    var estado = 0;
 
+
+    //MURO = M, UBICACIONES DE SPAWN= X, TODO LO DEMAS SE PUEDE LLENAR
     const nivel_prueba = [
-  ['M','M','M','M','M','M','M','M','M','M','M','M','M','M','M'],
-  ['M','x','x',   ,   ,   ,   ,   ,   ,   ,   ,   ,'x','x','M'],
-  ['M','x','M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M','x','M'],
-  ['M','x',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'x','M'],
-  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M'],
-  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
-  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M'],
-  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
-  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M'],
-  ['M','x',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'x','M'],
-  ['M','x','M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M','x','M'],
-  ['M','x','x',   ,   ,   ,   ,   ,   ,   ,   ,   ,'x','x','M'],
-  ['M','M','M','M','M','M','M','M','M','M','M','M','M','M','M']
+  ['M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M'],
+  ['M','x','x',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'x','x','M'],
+  ['M','x','M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,   ,   ,'M',   ,'x','M'],
+  ['M','x','M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,   ,   ,'M',   ,'x','M'],
+  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
+  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,   ,'M'],
+  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
+  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,   ,'M'],
+  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
+  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,   ,'M'],
+  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
+  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,   ,'M'],
+  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
+  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,   ,'M'],
+  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
+  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,   ,'M'],
+  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
+  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,   ,'M'],
+  ['M',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'M'],
+  ['M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,   ,'M'],
+  ['M','x',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'x','M'],
+  ['M','x','M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,'M',   ,   ,   ,'M',   ,'x','M'],
+  ['M','x','x',   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,   ,'x','x','M'],
+  ['M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M']
 ];
 
+let bloquesEnCavas = [];
+
+function generacion(){
+  bloquesEnCavas = [];
+
+  for (let f = 0; f < 24; f++){
+    bloquesEnCavas[f] = [];
+
+    for (let c = 0; c < 24; c++){
+      if(!nivel_prueba[f][c] && Math.random() < 0.85){
+        bloquesEnCavas[f][c] = new Muro((32*f),(32*c),32,32, true);
+
+      }else if (nivel_prueba[f][c] == 'M'){
+        bloquesEnCavas[f][c] = new Muro((32*f),(32*c),32,32, false);
+      }else{
+
+      }
+    }
+  }
+}
 
 
 
+  generacion();
+
+  function update() {
+    repaint();
+    window.requestAnimationFrame(update);
+  }
+
+
+  function repaint() {
+    for(let x = 0; x < 24; x++){
+      for(let y = 0; y < 24; y++){
+        if(bloquesEnCavas[x][y]){bloquesEnCavas[x][y].pintar(ctx);}
+     }
+    }
+  }
   </script>
 </html>
