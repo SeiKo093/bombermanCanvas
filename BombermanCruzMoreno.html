@@ -100,11 +100,47 @@
       }
     }
 
+    class Bomba{
+      constructor(w, h) {
+        this.x = 0;
+        this.y = 0;
+        this.w = w;
+        this.h = h;
+        this.alcance = 2;
+
+        this.tempo = 2000;
+      }
+
+      pintar(ctx){
+        ctx.fillStyle = "purple";
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+      }
+    }
+
+    class explosion{
+      constructor(w, h) {
+        this.x = 0;
+        this.y = 0;
+        this.w = w;
+        this.h = h;
+
+        this.tempo = 500;
+      }
+
+      pintar(ctx){
+        ctx.fillStyle = "orange";
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+      }
+
+    }
 
     var canvas = document.getElementById("canvas01");
     var ctx = canvas.getContext("2d");
     var casilla = 24;
     var estado = 0;
+
+    let bombasManager = [];
+    let explosivosManager = [];
 
 
     //MURO = M, UBICACIONES DE SPAWN= X, TODO LO DEMAS SE PUEDE LLENAR
@@ -172,6 +208,20 @@ function generacion(){
         if(bloquesEnCavas[x][y]){bloquesEnCavas[x][y].pintar(ctx);}
      }
     }
+
+    for(let x = 0; x < bombasManager.length; x++){
+      if(bombasManager[x]){
+        bombasManager.pintar(ctx);
+      }
+    }
+
+    for(let x = 0; x < explosivosManager.length; x++){
+      if(explosivosManagerr[x]){
+        explosivosManager.pintar(ctx);
+      }
+    }
+
+
   }
   </script>
 </html>
